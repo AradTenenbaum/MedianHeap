@@ -9,8 +9,11 @@ class Heap {
 public:
 	Heap(int _type=MAX) : type(_type) {};
 	Item Top() { return data[0]; };
-	void Insert(Item newItem);
+	Item* Insert(Item newItem);
+	int getHeapSize() { return heapSize; };
 	void DeleteTop();
+	void DeleteIndex(int index);
+	void setSharedItem(int i, Item* shared) { data[i].setSharedItem(shared); };
 private:
 	int getLeftNodeKeyIndex(int index) { return 2 * index + 1; }
 	int getRightNodeKeyIndex(int index) { return 2 * index + 2; }
