@@ -8,7 +8,7 @@ class Heap {
 	int heapSize = 0;
 public:
 	Heap(int _type=MAX) : type(_type) {};
-	Item Top() { return data[0]; };
+	Item Top();
 	Item* Insert(Item newItem);
 	int getHeapSize() { return heapSize; };
 	void DeleteTop();

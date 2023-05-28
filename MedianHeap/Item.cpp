@@ -4,6 +4,6 @@
 using namespace std;
 
 ostream& operator<<(ostream& os, const Item& item) {
-	os << "Key: " << item.getKey() << " Data: " << item.getData() << endl;
+	os << item.getKey() << " " << item.getData() << endl;
 	return os;
 }

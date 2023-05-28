@@ -13,7 +13,7 @@ Item* Heap::Insert(Item newItem) {
 	data[heapSize++] = newItem;
 	data[index].setSelfIndex(index);
 	int parentIndex = getParentIndex(index);
-	while (compare(parentIndex, index))
+	while (compare(parentIndex, index) && index != 0)
 	{
 		swapItems(&data[parentIndex], &data[index]);
 		index = parentIndex;
@@ -31,9 +31,19 @@ void Heap::DeleteTop() {
 		int rightIndex = getRightNodeKeyIndex(index);
 		int leftIndex = getLeftNodeKeyIndex(index);
 
-		while ((compare(index, rightIndex) || compare(index, leftIndex)) && 
-			(leftIndex < heapSize && rightIndex < heapSize)) {
-			if (compare(rightIndex, leftIndex)) {
+		while (((compare(index, rightIndex) && rightIndex < heapSize) ||
+			(compare(index, leftIndex) && leftIndex < heapSize))) {
+			if (!(leftIndex < heapSize) || !(rightIndex < heapSize)) {
+				if (!(leftIndex < heapSize)) {
+					swapItems(&data[rightIndex], &data[index]);
+					index = rightIndex;
+				}
+				else if (!(rightIndex < heapSize)) {
+					swapItems(&data[leftIndex], &data[index]);
+					index = leftIndex;
+				}
+			}
+			else if (compare(rightIndex, leftIndex)) {
 				swapItems(&data[leftIndex], &data[index]);
 				index = leftIndex;
 			}
@@ -69,4 +79,8 @@ void Heap::DeleteIndex(int index) {
 			leftIndex = getLeftNodeKeyIndex(index);
 		}
 	}
+}
+
+Item Heap::Top() {
+	return data[0];
 }

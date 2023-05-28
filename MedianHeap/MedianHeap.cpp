@@ -1,26 +1,90 @@
 #include "MedianHeap.h"
 
 void MedianHeap::Insert(int key, string value) {
-	if (key > smallNumMaxHeap.Top().getKey()) {
-		if (bigNumMaxHeap.getHeapSize() == smallNumMaxHeap.getHeapSize()) {
-			InsertToBigNumHeap(key, value);
+	if (smallNumMaxHeap.getHeapSize() > 0) {
+		if (key > smallNumMaxHeap.Top().getKey()) {
+			if (bigNumMaxHeap.getHeapSize() == smallNumMaxHeap.getHeapSize()) {
+				InsertToBigNumHeap(key, value);
+			}
+			else if (smallNumMaxHeap.getHeapSize() < bigNumMaxHeap.getHeapSize()) {
+				if (bigNumMinHeap.Top().getKey() < key) {
+					Item minInBig = DeleteFromMinBigHeapTop();
+					InsertToSmallNumHeap(minInBig.getKey(), minInBig.getData());
+					InsertToBigNumHeap(key, value);
+				}
+				else {
+					InsertToSmallNumHeap(key, value);
+				}
+			}
 		}
-		else if (smallNumMaxHeap.getHeapSize() < bigNumMaxHeap.getHeapSize()) {
-			Item minInBig = DeleteFromMinHeapTop(bigNumMinHeap, bigNumMaxHeap);
-;			InsertToSmallNumHeap(minInBig.getKey(), minInBig.getData());
+		else if(key < smallNumMaxHeap.Top().getKey()) {
+			if (bigNumMaxHeap.getHeapSize() > smallNumMaxHeap.getHeapSize()) {
+				InsertToSmallNumHeap(key, value);
+			}
+			else if (bigNumMaxHeap.getHeapSize() == smallNumMaxHeap.getHeapSize()) {
+				Item maxInSmall = DeleteFromMaxSmallHeapTop();
+				InsertToBigNumHeap(maxInSmall.getKey(), maxInSmall.getData());
+				InsertToSmallNumHeap(key, value);
+			}
+		}
+	}
+	else {
+		if (bigNumMaxHeap.getHeapSize() > 0) {
+			if (key > bigNumMinHeap.Top().getKey()) {
+				Item minInBig = DeleteFromMinBigHeapTop();
+				InsertToSmallNumHeap(minInBig.getKey(), minInBig.getData());
+				InsertToBigNumHeap(key, value);
+			}
+			else {
+				InsertToSmallNumHeap(key, value);
+			}
+		}
+		else {
 			InsertToBigNumHeap(key, value);
 		}
 	}
-	else if(key < smallNumMaxHeap.Top().getKey()) {
-		if (bigNumMaxHeap.getHeapSize() > smallNumMaxHeap.getHeapSize()) {
-			InsertToSmallNumHeap(key, value);
-		}
-		else if (bigNumMaxHeap.getHeapSize() == smallNumMaxHeap.getHeapSize()) {
-			Item maxInSmall = DeleteFromMaxHeapTop(smallNumMinHeap, smallNumMaxHeap);
-			InsertToBigNumHeap(maxInSmall.getKey(), maxInSmall.getData());
-			InsertToSmallNumHeap(key, value);
+}
+
+void MedianHeap::Median() {
+	if (bigNumMaxHeap.getHeapSize() == smallNumMaxHeap.getHeapSize()) {
+		cout << smallNumMaxHeap.Top();
+	}
+	else {
+		cout << bigNumMinHeap.Top();
+	}
+}
+
+void MedianHeap::Min() {
+	if (smallNumMinHeap.getHeapSize() > 0) {
+		cout << smallNumMinHeap.Top();
+	}
+	else {
+		cout << bigNumMinHeap.Top();
+	}
+}
+
+void MedianHeap::DeleteMax() {
+	Item max = DeleteFromMaxBigHeapTop();
+	if (bigNumMaxHeap.getHeapSize() < smallNumMaxHeap.getHeapSize()) {
+		Item maxInSmall = DeleteFromMaxSmallHeapTop();
+		InsertToBigNumHeap(maxInSmall.getKey(), maxInSmall.getData());
+	}
+	cout << max;
+}
+
+void MedianHeap::DeleteMin() {
+	Item min;
+	if (smallNumMinHeap.getHeapSize() > 0) {
+		min = DeleteFromMinSmallHeapTop();
+		if (bigNumMaxHeap.getHeapSize() == (smallNumMaxHeap.getHeapSize() + 2)) {
+			Item minInBig = DeleteFromMinBigHeapTop();
+			InsertToSmallNumHeap(minInBig.getKey(), minInBig.getData());
 		}
 	}
+	else {
+		min = DeleteFromMinBigHeapTop();
+	}
+	cout << min;
 }
 
 void MedianHeap::InsertToBigNumHeap(int key, string value) {
@@ -35,16 +99,34 @@ void MedianHeap::InsertToSmallNumHeap(int key, string value) {
 	smallNumMaxHeap.setSharedItem(maxItem->getSelfIndex(), minItem);
 }
 
-Item MedianHeap::DeleteFromMinHeapTop(Heap& minHeap, Heap& maxHeap) {
-	Item min = minHeap.Top();
-	minHeap.DeleteTop();
-	maxHeap.DeleteIndex(min.getIndexInOtherHeap());
+Item MedianHeap::DeleteFromMinBigHeapTop() {
+	Item min = bigNumMinHeap.Top();
+	bigNumMinHeap.DeleteTop();
+	bigNumMaxHeap.DeleteIndex(min.getIndexInOtherHeap());
 	return min;
 }
 
-Item MedianHeap::DeleteFromMaxHeapTop(Heap& minHeap, Heap& maxHeap) {
-	Item max = maxHeap.Top();
-	maxHeap.DeleteTop();
-	minHeap.DeleteIndex(max.getIndexInOtherHeap());
+Item MedianHeap::DeleteFromMinSmallHeapTop() {
+	Item min = smallNumMinHeap.Top();
+	smallNumMinHeap.DeleteTop();
+	smallNumMaxHeap.DeleteIndex(min.getIndexInOtherHeap());
+	return min;
+}
+
+Item MedianHeap::DeleteFromMaxBigHeapTop() {
+	Item max = bigNumMaxHeap.Top();
+	bigNumMaxHeap.DeleteTop();
+	bigNumMinHeap.DeleteIndex(max.getIndexInOtherHeap());
 	return max;
+}
+
+Item MedianHeap::DeleteFromMaxSmallHeapTop() {
+	Item max = smallNumMaxHeap.Top();
+	smallNumMaxHeap.DeleteTop();
+	smallNumMinHeap.DeleteIndex(max.getIndexInOtherHeap());
+	return max;
+}
+
+MedianHeap CreateEmpty() { 
+	return MedianHeap(); 
 }

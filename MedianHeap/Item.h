@@ -4,6 +4,7 @@
 using namespace std;
 
 class Item {
+	enum {MAX, MIN};
 	int key;
 	string data;
 	Item* sharedItem;
@@ -20,5 +21,6 @@ public:
 	void setSelfIndex(int num) { selfIndex = num; };
 	int getIndexInOtherHeap() { return sharedItem->getSelfIndex(); };
 	void setSharedItem(Item* _sharedItem) { sharedItem = _sharedItem; };
+	Item* getSharedItem() { return sharedItem; };
 	friend ostream& operator<< (ostream& os, const Item& item);
 };
